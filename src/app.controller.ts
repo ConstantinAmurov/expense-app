@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   Param,
   Post,
   Put,
@@ -19,7 +20,7 @@ export class AppController {
     if (!isReportType(type)) {
       throw new BadRequestException();
     }
-    
+
     return data.report.filter((report) => report.reportType === type);
   }
 
@@ -52,13 +53,44 @@ export class AppController {
     data.report.push(newReport);
   }
 
-  @Put('id')
-  updateReport() {
-    return [];
+  @Put(':id')
+  updateReport(
+    @Param('type') reportType: ReportType,
+    @Param('id') id: string,
+    @Body() body: BodyCreateRequest,
+  ) {
+    if (!isReportType(reportType)) {
+      throw new BadRequestException();
+    }
+
+    const reportIndex = data.report.findIndex((report) => report.id === id);
+    if (reportIndex === -1) {
+      throw new BadRequestException();
+    }
+
+    data.report[reportIndex] = {
+      ...data.report[reportIndex],
+      ...body,
+      updated_at: new Date()
+    };
+    return data.report[reportIndex];
   }
 
-  @Delete('id')
-  deleteReport() {
-    return [];
+  @HttpCode(204)
+  @Delete(':id')
+  deleteReport(
+    @Param('type') reportType: ReportType,
+    @Param('id') id: string) {
+    if (!isReportType(reportType)) {
+      throw new BadRequestException();
+    }
+
+    const reportIndex = data.report.findIndex((report) => report.id === id);
+    if (reportIndex === -1) {
+      throw new BadRequestException();
+    }
+
+    data.report.splice(reportIndex,1);
+    return;
   }
 }
