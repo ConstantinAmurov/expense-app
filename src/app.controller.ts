@@ -9,19 +9,21 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { ReportType, data, Report, BodyCreateRequest } from './database/data';
-import { randomUUID } from 'crypto';
+import { ReportType, BodyCreateRequest } from './database/data';
 import { isReportType } from './utils';
+import { AppService } from './app.service';
 
 @Controller('report/:type')
 export class AppController {
+  constructor(private readonly appService: AppService) {}
+
   @Get()
   getAllReports(@Param('type') type: ReportType) {
     if (!isReportType(type)) {
       throw new BadRequestException();
     }
 
-    return data.report.filter((report) => report.reportType === type);
+    return this.appService.getAllReports(type);
   }
 
   @Get(':id')
@@ -29,9 +31,7 @@ export class AppController {
     @Param('type') type: ReportType,
     @Param('id') id: string,
   ) {
-    return data.report
-      .filter((report) => report.reportType === type)
-      .find((report) => report.id === id);
+    return this.appService.getIncomeReportById(type, id);
   }
 
   @Post()
@@ -43,14 +43,7 @@ export class AppController {
       throw new BadRequestException();
     }
 
-    const newReport: Report = {
-      id: randomUUID(),
-      created_at: new Date(),
-      updated_at: new Date(),
-      reportType,
-      ...body,
-    };
-    data.report.push(newReport);
+    return this.appService.createReport(reportType, body);
   }
 
   @Put(':id')
@@ -63,34 +56,16 @@ export class AppController {
       throw new BadRequestException();
     }
 
-    const reportIndex = data.report.findIndex((report) => report.id === id);
-    if (reportIndex === -1) {
-      throw new BadRequestException();
-    }
-
-    data.report[reportIndex] = {
-      ...data.report[reportIndex],
-      ...body,
-      updated_at: new Date()
-    };
-    return data.report[reportIndex];
+    return this.appService.updateReport(id, body);
   }
 
   @HttpCode(204)
   @Delete(':id')
-  deleteReport(
-    @Param('type') reportType: ReportType,
-    @Param('id') id: string) {
+  deleteReport(@Param('type') reportType: ReportType, @Param('id') id: string) {
     if (!isReportType(reportType)) {
       throw new BadRequestException();
     }
 
-    const reportIndex = data.report.findIndex((report) => report.id === id);
-    if (reportIndex === -1) {
-      throw new BadRequestException();
-    }
-
-    data.report.splice(reportIndex,1);
-    return;
+    return this.appService.deleteReport(id);
   }
 }
