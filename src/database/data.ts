@@ -11,7 +11,10 @@ export interface Report {
   reportType: ReportType;
 }
 
-export type ReportType = 'income' | 'expense';
+export enum ReportType  {
+  INCOME= 'income',
+  EXPENSE = 'expense'
+}
 
 export type BodyCreateRequest = Pick<Report, 'amount' | 'source'>;
 
@@ -21,7 +24,7 @@ const dummyReport: Report = {
   amount: 7500,
   created_at: new Date(),
   updated_at: new Date(),
-  reportType: 'income',
+  reportType: ReportType.INCOME,
 };
 const dummyReport2: Report = {
   id: '2',
@@ -29,7 +32,7 @@ const dummyReport2: Report = {
   amount: 1500,
   created_at: new Date(),
   updated_at: new Date(),
-  reportType: 'income',
+  reportType: ReportType.INCOME,
 };
 
 const dummyReport3: Report = {
@@ -38,7 +41,7 @@ const dummyReport3: Report = {
   amount: 500,
   created_at: new Date(),
   updated_at: new Date(),
-  reportType: 'expense',
+  reportType: ReportType.EXPENSE,
 };
 export const data: Data = {
   report: [dummyReport, dummyReport2, dummyReport3],
