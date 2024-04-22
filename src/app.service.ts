@@ -1,22 +1,31 @@
 // This is where all the business logic will be stored
 
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { BodyCreateRequest, Report, ReportType, data } from './database/data';
+import { BadRequestException,  Injectable } from '@nestjs/common';
+import { Report, ReportType, data } from './database/data';
 import { randomUUID } from 'crypto';
+import { CreateReportDto, ReportResponseDto, UpdateReportDto } from './dtos/report.dto';
 
 @Injectable()
 export class AppService {
-  getAllReports(type: ReportType) {
-    return data.report.filter((report) => report.reportType === type);
+  getAllReports(type: ReportType) :ReportResponseDto[] {
+    const allReports =data.report.filter((report) => report.reportType === type);
+
+    return allReports.map((report) => new ReportResponseDto(report)); 
   }
 
-  getIncomeReportById(type: ReportType, id: string) {
-    return data.report
-      .filter((report) => report.reportType === type)
-      .find((report) => report.id === id);
+  getIncomeReportById(type: ReportType, id: string): ReportResponseDto {
+
+    const report = data.report
+    .filter((report) => report.reportType === type)
+    .find((report) => report.id === id);
+
+    if(!report) return;
+
+    return new ReportResponseDto(report);
+    
   }
 
-  createReport(type: ReportType, body: BodyCreateRequest) {
+  createReport(type: ReportType, body: CreateReportDto): ReportResponseDto {
     const newReport: Report = {
       id: randomUUID(),
       created_at: new Date(),
@@ -25,9 +34,10 @@ export class AppService {
       ...body,
     };
     data.report.push(newReport);
+    return new ReportResponseDto(newReport);
   }
 
-  updateReport(id: string, body: BodyCreateRequest) {
+  updateReport(id: string, body: UpdateReportDto): ReportResponseDto {
     const reportIndex = data.report.findIndex((report) => report.id === id);
     if (reportIndex === -1) {
       throw new BadRequestException();
@@ -38,7 +48,7 @@ export class AppService {
       ...body,
       updated_at: new Date(),
     };
-    return data.report[reportIndex];
+    return new ReportResponseDto(data.report[reportIndex]);
   }
 
   deleteReport(id: string) {

@@ -11,12 +11,10 @@ export interface Report {
   reportType: ReportType;
 }
 
-export enum ReportType  {
-  INCOME= 'income',
-  EXPENSE = 'expense'
+export enum ReportType {
+  INCOME = 'income',
+  EXPENSE = 'expense',
 }
-
-export type BodyCreateRequest = Pick<Report, 'amount' | 'source'>;
 
 const dummyReport: Report = {
   id: '1',
