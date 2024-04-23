@@ -5,7 +5,7 @@ import {
   IsNotEmpty,
   IsOptional,
 } from 'class-validator';
-import { Exclude,Expose } from 'class-transformer';
+import { Exclude, Expose } from 'class-transformer';
 
 import { Report, ReportType } from 'src/database/data';
 
@@ -32,24 +32,24 @@ export class UpdateReportDto {
 }
 
 export class ReportResponseDto {
-    id: string;
-    source: string;
-    amount: number;
+  id: string;
+  source: string;
+  amount: number;
 
-    @Exclude()
-    created_at: Date;
-    @Exclude()
-    updated_at: Date;
-    reportType: ReportType;
+  @Exclude()
+  created_at: Date;
+  @Exclude()
+  updated_at: Date;
+  reportType: ReportType;
 
-    @Expose({
-        name:'createdAt'
-    })
-    transformCreatedAt() {
-        return this.created_at
-    }
+  @Expose({
+    name: 'createdAt',
+  })
+  transformCreatedAt() {
+    return this.created_at;
+  }
 
-    constructor(partial :Partial<ReportResponseDto>) {
-        Object.assign(this,partial);
-    }
+  constructor(partial: Partial<ReportResponseDto>) {
+    Object.assign(this, partial);
+  }
 }
